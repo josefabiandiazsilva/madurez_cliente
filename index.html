@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PMBOK 8 Consulting Challenge · Madurez del cliente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#E50914;--dred:#B20710;--black:#141414;--gray:#f5f5f5;--mid:#6b6b6b;--line:#e4e4e4}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b0b0b;overflow:hidden;font-family:Inter,"Helvetica Neue",Arial,sans-serif;color:var(--black)}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;background:#fff;overflow:hidden;box-shadow:0 0 60px rgba(229,9,20,.25)}
+.t,h1,h2{font-family:"Bebas Neue",Impact,"Arial Narrow",sans-serif;font-weight:400;letter-spacing:.5px}
+#bar{position:absolute;left:0;top:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:20;color:var(--black)}
+#brand{font-family:"Bebas Neue",Impact,sans-serif;font-size:26px;letter-spacing:1px}
+#brand b{color:var(--red);font-weight:400}
+#brand small{font-family:Inter,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-left:10px;opacity:.6}
+#domchip{background:var(--red);color:#fff;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:30px;cursor:pointer;opacity:0;transition:.3s}
+#domchip.show{opacity:1}
+#domchip:hover{background:var(--black)}
+#stage.dark #bar{color:#fff}
+#prog{position:absolute;left:0;bottom:0;height:6px;background:var(--red);width:0;transition:width .4s;z-index:25}
+#count{position:absolute;right:48px;bottom:18px;font-size:12px;font-weight:600;color:var(--mid);z-index:25;letter-spacing:1px}
+#stage.dark #count{color:#bbb}
+.slide{position:absolute;inset:0;padding:78px 64px 56px;background:#fff;opacity:0;visibility:hidden;transition:opacity .45s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible}
+.slide.dark{color:#fff;background:var(--black)}
+.hero{background:var(--img) center/cover,linear-gradient(135deg,#B20710,#141414)}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(10,10,10,.96) 0%,rgba(10,10,10,.82) 50%,rgba(178,7,16,.6) 100%)}
+.hero>*{position:relative}
+.k{color:var(--red);font-weight:800;font-size:14px;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:62px;line-height:1;margin-bottom:14px}
+h1 em{color:var(--red);font-style:normal}
+h2{font-size:34px;line-height:1.05;margin-bottom:8px}
+p{font-size:19px;line-height:1.4}
+.sub{color:var(--mid);font-size:19px;margin-bottom:14px}
+.dark .sub{color:#ccc}
+.step{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s}
+.step.on{opacity:1;transform:none}
+tr.step{transform:none}
+.step.stag,.step.stag.on{opacity:1;transform:none}
+.stag>*{opacity:0;transform:translateY(14px);transition:opacity .35s,transform .35s}
+.stag.on>*{opacity:1;transform:none;transition-delay:calc(var(--i,0)*90ms)}
+.row{display:flex;gap:16px}
+.col{display:flex;flex-direction:column;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.withphoto{display:grid;grid-template-columns:1fr 300px;gap:28px}
+.mt{margin-top:14px}.mt2{margin-top:24px}
+.center{text-align:center}
+.card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--red);border-radius:10px;padding:12px 16px;box-shadow:0 6px 16px rgba(0,0,0,.07);font-size:18px;line-height:1.3}
+.card b{display:block;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:3px}
+.card small{display:block;color:var(--mid);font-size:15px;margin-top:2px}
+.blk{background:var(--black);color:#fff;border-color:var(--black);border-left-color:var(--red)}
+.blk small{color:#bbb}
+.red{background:var(--red);color:#fff;border-color:var(--red);border-left-color:var(--black)}
+.red b{color:#fff;opacity:.85}.red small{color:#ffd9dc}
+.dark .card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);border-left-color:var(--red);color:#fff;box-shadow:none}
+.chip{display:inline-block;background:var(--black);color:#fff;border-radius:30px;padding:8px 16px;font-weight:600;font-size:17px}
+.chip.r{background:var(--red)}
+.chip.o{background:#fff;color:var(--black);border:2px solid var(--black)}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ar{color:var(--red);font-size:28px;font-weight:800}
+.box{background:var(--black);color:#fff;border-radius:10px;padding:12px 16px;font-weight:600;font-size:17px;text-align:center}
+.box.r{background:var(--red)}
+.box.w{background:#fff;color:var(--black);border:2px solid var(--black)}
+.big{font-family:"Bebas Neue",Impact,sans-serif;font-size:84px;line-height:.9;color:var(--red)}
+.quote{background:var(--black);color:#fff;border-left:8px solid var(--red);border-radius:6px;padding:16px 22px;font-size:20px;line-height:1.35}
+.quote b{color:var(--red)}
+.concept{background:linear-gradient(90deg,var(--red),var(--dred));color:#fff;border-radius:10px;padding:14px 22px;font-size:21px;font-weight:800;text-align:center}
+.ul{list-style:none}
+.ul li{padding:5px 0 5px 28px;position:relative;font-size:18px;line-height:1.25}
+.ul li::before{content:"";position:absolute;left:4px;top:11px;width:11px;height:11px;background:var(--red);border-radius:2px}
+.ul.ok li::before{content:"✓";background:none;color:var(--red);font-weight:800;top:4px;width:auto;height:auto;font-size:18px}
+.ul.no li::before{content:"✕";background:none;color:var(--mid);font-weight:800;top:4px;width:auto;height:auto;font-size:18px}
+.tbl{width:100%;border-collapse:collapse;font-size:18px}
+.tbl th{background:var(--black);color:#fff;text-align:left;padding:10px 14px;font-weight:600;font-size:14px;letter-spacing:1.5px;text-transform:uppercase}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--line)}
+.tbl tr:nth-child(even) td{background:var(--gray)}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl tr.tot td{background:var(--red);color:#fff;font-weight:800}
+.photo{background:var(--img) center/cover,linear-gradient(160deg,#B20710,#141414);border-radius:12px;position:relative;min-height:380px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.photo::after{content:"";position:absolute;inset:0;border-radius:12px;background:linear-gradient(180deg,transparent 55%,rgba(20,20,20,.75))}
+.photo span{position:absolute;left:16px;bottom:14px;z-index:2;color:#fff;font-family:"Bebas Neue",Impact,sans-serif;font-size:26px;line-height:1}
+.hint{font-size:14px;color:var(--mid)}
+/* orbit */
+.orbit{position:relative;height:430px;margin-top:4px}
+.orbit .ctr{position:absolute;left:50%;top:50%;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;background:radial-gradient(circle,var(--red),var(--dred));color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:"Bebas Neue",Impact,sans-serif;font-size:23px;line-height:1.05;padding:30px;box-shadow:0 0 0 12px rgba(229,9,20,.15),0 0 0 28px rgba(229,9,20,.07)}
+.orbit .nd{position:absolute;width:230px;height:84px;margin:-42px 0 0 -115px;background:var(--black);color:#fff;border-radius:10px;border-left:6px solid var(--red);padding:9px 12px;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
+.orbit .nd:hover{background:var(--dred)}
+.orbit .nd b{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:16px;letter-spacing:.2px;display:block;white-space:nowrap}
+.orbit .nd b i{color:var(--red);font-style:normal;margin-right:6px}
+.orbit .nd:hover b i{color:#fff}
+.orbit .nd span{font-size:13px;color:#ccc;line-height:1.2;display:block}
+/* matrix */
+.quad{display:grid;grid-template-columns:34px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:10px;height:380px}
+.quad .qh{font-weight:800;font-size:13px;letter-spacing:2px;color:var(--mid);text-align:center;text-transform:uppercase}
+.quad .qv{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;font-size:13px;letter-spacing:2px;color:var(--mid);text-align:center;text-transform:uppercase}
+.q{border-radius:12px;padding:14px 16px;font-size:17px}
+.q h3{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:26px;margin-bottom:6px}
+.q p{font-size:16px;line-height:1.3}
+.q.a{background:var(--red);color:#fff}.q.b{background:var(--black);color:#fff}.q.c{background:var(--gray);border:2px solid var(--black)}.q.d{background:#fff;border:2px solid var(--line)}
+.q em{font-style:normal;display:inline-block;background:rgba(255,255,255,.2);padding:2px 10px;border-radius:20px;margin:6px 3px 0 0;font-size:15px;font-weight:600}
+.q.c em,.q.d em{background:var(--black);color:#fff}
+/* timeline */
+.tl{position:relative;display:flex;justify-content:space-between;margin-top:44px;padding:0 10px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:19px;height:4px;background:var(--black)}
+.tl .m{position:relative;width:200px;text-align:center;font-weight:600;font-size:17px}
+.tl .m::before{content:"";display:block;width:34px;height:34px;background:var(--red);transform:rotate(45deg);margin:2px auto 22px;border:4px solid #fff;box-shadow:0 0 0 3px var(--red)}
+.tl .m small{display:block;color:var(--mid);font-weight:400}
+/* cascade */
+.chips7{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chips7 .c7{background:var(--gray);border:2px solid var(--line);border-radius:8px;padding:7px 10px;font-size:15px;font-weight:600;color:var(--mid);transition:.4s}
+.chips7 .c7.lit{background:var(--red);border-color:var(--red);color:#fff;transform:scale(1.05);box-shadow:0 0 18px rgba(229,9,20,.6)}
+.chain{position:relative;padding-left:22px}
+.chain::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:4px;background:linear-gradient(var(--red),var(--black));border-radius:2px}
+.chain .cl{display:flex;align-items:center;gap:12px;height:50px;position:relative}
+.chain .cl::before{content:"";position:absolute;left:-22px;width:16px;height:16px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 0 0 2px var(--red)}
+.chain .cl .d{background:var(--black);color:#fff;font-family:"Bebas Neue",Impact,sans-serif;font-size:21px;letter-spacing:1px;padding:4px 14px;border-radius:6px;min-width:178px;text-align:center}
+.chain .cl .e{font-size:17px;font-weight:600}
+.chain .cl .e i{color:var(--red);font-style:normal;font-weight:800}
+/* niveles */
+.stairs{display:flex;align-items:flex-end;gap:12px;height:316px}
+.stp{flex:1;border-radius:10px 10px 0 0;padding:14px 16px;color:#fff}
+.stp .nv{font-family:"Bebas Neue",Impact,sans-serif;font-size:56px;line-height:.9;opacity:.9}
+.stp h3{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:27px;letter-spacing:.5px;margin:2px 0 6px}
+.stp p{font-size:15px;line-height:1.3}
+/* compromiso */
+.eng td{height:48px}
+.eng td.cell{cursor:pointer;transition:background .2s}
+.eng td.cell:hover{background:#ffe3e5!important}
+.mk{display:inline-flex;width:30px;height:30px;border-radius:50%;font-weight:800;font-size:14px;color:#fff;align-items:center;justify-content:center;margin:0 2px}
+.mk.a{background:var(--black)}.mk.d{background:var(--red)}
+.gap{font-family:"Bebas Neue",Impact,sans-serif;font-size:26px}
+.modes{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.modes span{font-weight:600;font-size:15px;color:var(--mid);margin-right:4px}
+.pill{background:#fff;border:2px solid var(--black);color:var(--black);border-radius:30px;padding:7px 18px;font:700 14px Inter,Arial,sans-serif;cursor:pointer;transition:.2s}
+.pill:hover{border-color:var(--red);color:var(--red)}
+.pill.on{background:var(--black);color:#fff}
+.pill.on.r{background:var(--red);border-color:var(--red)}
+/* simulador */
+.sim{display:grid;grid-template-columns:1fr 410px;gap:26px;align-items:start}
+.tbl td.sel,.tbl th.sel{background:var(--red)!important;color:#fff;font-weight:800}
+.eff{display:flex;flex-direction:column;gap:6px}
+.eff div{display:flex;gap:10px;align-items:center;background:var(--gray);border-left:5px solid var(--red);border-radius:6px;padding:6px 12px;font-size:16px;font-weight:600;min-height:38px}
+.eff div b{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);min-width:104px}
+/* diagnóstico */
+.diag{display:grid;grid-template-columns:1fr 400px;gap:26px;align-items:start}
+.dr{display:grid;grid-template-columns:200px 1fr;align-items:center;height:41px;border-bottom:1px solid var(--line);font-weight:600;font-size:17px}
+.pills{display:flex;gap:8px}
+.pills button{width:50px;height:30px;border-radius:30px;border:2px solid var(--line);background:#fff;font:700 14px Inter,Arial,sans-serif;cursor:pointer;color:var(--mid);transition:.2s}
+.pills button:hover{border-color:var(--red);color:var(--red)}
+.pills button.on{background:var(--red);border-color:var(--red);color:#fff}
+.scale{display:grid;grid-template-columns:200px 1fr;font-size:12px;color:var(--mid);letter-spacing:1px;text-transform:uppercase;font-weight:800;margin-bottom:2px}
+.scale div{display:grid;grid-template-columns:repeat(5,50px);gap:8px;text-align:center}
+.res{background:var(--black);color:#fff;border-radius:12px;border-left:8px solid var(--red);padding:12px 18px}
+.res .lv{font-family:"Bebas Neue",Impact,sans-serif;font-size:34px;line-height:1;color:var(--red)}
+.res .st{font-family:"Bebas Neue",Impact,sans-serif;font-size:24px;letter-spacing:1px}
+.res .sc{font-size:14px;color:#ccc;line-height:1.45;margin-top:4px}
+.res .sc b{color:#fff}
+/* controls */
+#ctl{position:fixed;right:14px;bottom:12px;display:flex;gap:8px;z-index:50}
+#ctl button,.btn{background:rgba(20,20,20,.88);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:9px 16px;font:600 13px Inter,Arial,sans-serif;cursor:pointer;letter-spacing:.5px;transition:.2s}
+#ctl button:hover,.btn:hover{background:var(--red)}
+#ctl .main{background:var(--red)}
+#ctl .main:hover{background:#fff;color:var(--black)}
+#hintbar{position:fixed;left:14px;bottom:14px;font-size:12px;color:#888;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.mbox{background:#fff;border-radius:16px;width:min(1040px,100%);max-height:94vh;overflow:auto;display:grid;grid-template-columns:290px 1fr;box-shadow:0 30px 80px rgba(0,0,0,.6);border-top:6px solid var(--red)}
+.mnav{background:var(--black);padding:18px 14px;display:flex;flex-direction:column;gap:6px}
+.mnav h3{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:26px;color:#fff;margin:0 6px 6px;letter-spacing:1px}
+.mnav h3 em{color:var(--red);font-style:normal}
+.mnav button{text-align:left;background:transparent;color:#ddd;border:0;border-radius:8px;padding:10px 12px;font:600 15px Inter,Arial,sans-serif;cursor:pointer;display:flex;gap:10px;align-items:center}
+.mnav button i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#333;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.mnav button:hover{background:#2a2a2a}
+.mnav button.sel{background:var(--red);color:#fff}
+.mnav button.sel i{background:#fff;color:var(--red)}
+.mdet{padding:26px 32px 24px;position:relative}
+.mdet .x{position:absolute;right:16px;top:12px;background:none;border:0;font-size:30px;cursor:pointer;color:var(--mid)}
+.mdet .x:hover{color:var(--red)}
+.mdet .ico{font-size:44px;line-height:1}
+.mdet h2{font-size:48px;margin:4px 0 2px}
+.mdet .q1{color:var(--red);font-weight:800;font-size:20px;margin-bottom:14px}
+.mdet h4{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin:14px 0 4px}
+.mdet p{font-size:17px;line-height:1.45}
+.mdet .go{margin-top:18px;display:inline-block;background:var(--red);color:#fff;border:0;border-radius:30px;padding:10px 20px;font:700 14px Inter,Arial,sans-serif;cursor:pointer}
+.mdet .go:hover{background:var(--black)}
+.mdet .conn{background:var(--gray);border-left:5px solid var(--red);border-radius:6px;padding:10px 14px;font-size:15px;margin-top:14px}
+.idx{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:22px;max-height:90vh;overflow:auto;background:#fff;border-radius:16px;border-top:6px solid var(--red);width:min(1000px,100%)}
+.idx h3{grid-column:1/-1;font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:32px}
+.idx button{text-align:left;background:var(--gray);border:0;border-left:5px solid var(--red);border-radius:6px;padding:9px 12px;font:600 14px Inter,Arial,sans-serif;cursor:pointer}
+.idx button:hover{background:var(--black);color:#fff}
+.idx button i{font-style:normal;color:var(--red);font-weight:800;margin-right:6px}
+@media(max-width:820px){.mbox{grid-template-columns:1fr}.mnav{flex-direction:row;flex-wrap:wrap}.idx{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="bar">
+    <div id="brand"><b>PMBOK 8</b> CONSULTING CHALLENGE<small>Madurez del cliente</small></div>
+    <div id="domchip" title="Abrir guía de este dominio"></div>
+  </div>
+
+<!-- 1 PORTADA -->
+<section class="slide dark hero" data-title="Portada" style="--img:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80')">
+  <div class="k" style="margin-top:14px">Diagnóstico del cliente · Consultoría guiada por PMBOK 8</div>
+  <h1 style="font-size:92px;line-height:.92;margin:4px 0 8px">MADUREZ<br>DEL <em>CLIENTE</em></h1>
+  <h2 style="font-size:34px;color:#fff;margin-bottom:14px">Cómo reconocerla y cómo cambia el proyecto</h2>
+  <p style="max-width:760px;color:#ddd" class="step">Antes de prometer fechas, cifras y resultados, una firma consultora necesita saber qué tan preparado está el cliente para recibir el cambio.</p>
+  <div class="flow mt2 step stag" style="gap:14px">
+    <span class="chip o" style="background:transparent;color:#fff;border-color:#fff">OBSERVAR</span><span class="ar">→</span>
+    <span class="chip r">DIAGNOSTICAR</span><span class="ar">→</span>
+    <span class="chip r">ADAPTAR EL PLAN</span><span class="ar">→</span>
+    <span class="chip" style="background:#fff;color:var(--red)">ENTREGAR VALOR</span>
+  </div>
+  <div class="card step mt2" style="max-width:760px;font-size:21px"><b>Cliente</b>Empresa CREATIVE<small style="color:#ddd">Proyecto: Automatización del proceso de gestión y seguimiento de pedidos</small></div>
+</section>
+
+<!-- 2 DOS CLIENTES -->
+<section class="slide" data-title="Mismo proyecto, distinto resultado">
+  <div class="k">El punto de partida</div>
+  <h1>Mismo proyecto, <em>distinto resultado</em></h1>
+  <div class="g2" style="gap:24px">
+    <div class="card step" style="padding:16px 22px"><h2>Cliente A</h2>
+      <ul class="ul ok"><li>Sponsor activo y disponible</li><li>Proceso documentado</li><li>Equipo con tiempo asignado</li><li>Decisiones en días</li></ul>
+      <div class="flow mt" style="gap:14px"><span class="big">6 sem</span><span style="font-size:17px;font-weight:600">entrega a tiempo<br>y usuarios que adoptan</span></div></div>
+    <div class="card blk step" style="padding:16px 22px"><h2>Cliente B</h2>
+      <ul class="ul no" style="color:#ddd"><li>Sponsor ausente</li><li>Proceso “en la cabeza” de las personas</li><li>Equipo sin tiempo ni accesos</li><li>Decisiones que tardan semanas</li></ul>
+      <div class="flow mt" style="gap:14px"><span class="big">11 sem</span><span style="font-size:17px;font-weight:600;color:#ddd">sobrecostos, retrabajo<br>y resistencia</span></div></div>
+  </div>
+  <div class="quote step mt2" style="font-size:24px">La tecnología fue la misma. <b>Lo que cambió fue la madurez del cliente.</b></div>
+</section>
+
+<!-- 3 DEFINICIÓN -->
+<section class="slide" data-title="¿Qué es la madurez del cliente?">
+  <div class="k">Concepto clave</div>
+  <h1>¿Qué es la <em>madurez</em> del cliente?</h1>
+  <div class="withphoto" style="grid-template-columns:1fr 280px">
+    <div>
+      <div class="concept step" style="font-size:20px;text-align:left">Capacidad de una organización y de sus partes interesadas para <u>definir, decidir, apoyar, adoptar y sostener</u> un cambio.</div>
+      <div class="col step stag mt2" style="gap:7px">
+        <div class="card" style="padding:8px 14px"><b style="display:inline;margin-right:8px">Definir</b>¿Sabe con claridad qué necesita?</div>
+        <div class="card" style="padding:8px 14px"><b style="display:inline;margin-right:8px">Decidir</b>¿Toma decisiones a tiempo y con dueño?</div>
+        <div class="card" style="padding:8px 14px"><b style="display:inline;margin-right:8px">Apoyar</b>¿Aporta personas, tiempo y accesos?</div>
+        <div class="card" style="padding:8px 14px"><b style="display:inline;margin-right:8px">Adoptar</b>¿Cambia su forma de trabajar?</div>
+        <div class="card" style="padding:8px 14px"><b style="display:inline;margin-right:8px">Sostener</b>¿Mantiene la solución cuando el consultor se va?</div>
+      </div>
+    </div>
+    <div class="photo" style="--img:url('https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80')"><span>Preparación real<br>para el cambio</span></div>
+  </div>
+</section>
+
+<!-- 4 LO QUE NO ES -->
+<section class="slide" data-title="Lo que la madurez no es">
+  <div class="k">Aclarando el concepto</div>
+  <h1>Lo que la madurez <em>no es</em></h1>
+  <div class="g2" style="gap:24px">
+    <div class="card blk step" style="padding:16px 22px"><h2 style="color:#ccc">✕ No es</h2>
+      <ul class="ul no" style="color:#ddd"><li>El tamaño de la empresa</li><li>El presupuesto disponible</li><li>La cantidad de herramientas tecnológicas</li><li>El entusiasmo inicial del cliente</li></ul></div>
+    <div class="card step" style="padding:16px 22px"><h2 style="color:var(--red)">✓ Sí es</h2>
+      <ul class="ul ok"><li>Claridad sobre sus procesos</li><li>Decisiones oportunas</li><li>Capacidad de absorber el cambio</li><li>Disciplina en los acuerdos</li><li>Cultura de anticipar riesgos</li></ul></div>
+  </div>
+  <div class="quote step mt2">Una empresa grande puede tener <b>baja madurez</b> para un proyecto concreto. Una pequeña puede tener <b>alta madurez</b>.</div>
+</section>
+
+<!-- 5 ORBITA -->
+<section class="slide" data-title="Siete dimensiones, siete dominios">
+  <div class="k">PMBOK 8 · Perfil de madurez</div>
+  <h1 style="margin-bottom:0">Siete dimensiones, <em>siete dominios</em></h1>
+  <div class="orbit" id="orbit">
+    <div class="ctr step">PERFIL DE MADUREZ DEL CLIENTE</div>
+  </div>
+  <p class="hint step center" style="margin-top:-6px">Haz clic en cualquier dimensión para abrir la guía rápida · La madurez se mide dominio por dominio.</p>
+</section>
+
+<!-- 6 NIVELES -->
+<section class="slide" data-title="Cinco niveles de madurez">
+  <div class="k">Escala de evaluación</div>
+  <h1>Cinco <em>niveles</em> de madurez</h1>
+  <div class="stairs step stag">
+    <div class="stp" style="height:150px;background:#3a3a3a"><div class="nv">1</div><h3>Reactivo</h3><p>Improvisa. Depende de personas clave.</p></div>
+    <div class="stp" style="height:196px;background:#141414"><div class="nv">2</div><h3>Emergente</h3><p>Hay prácticas, pero no son consistentes.</p></div>
+    <div class="stp" style="height:228px;background:#8e0a12"><div class="nv">3</div><h3>Definido</h3><p>Procesos y roles documentados.</p></div>
+    <div class="stp" style="height:268px;background:#c40812"><div class="nv">4</div><h3>Gestionado</h3><p>Mide, decide con datos y controla cambios.</p></div>
+    <div class="stp" style="height:312px;background:#E50914"><div class="nv">5</div><h3>Optimizado</h3><p>Mejora continua y aprende de cada proyecto.</p></div>
+  </div>
+  <div class="concept step mt">Un cliente puede ser nivel 4 en Finanzas y nivel 1 en Riesgo: el diagnóstico es por dimensión.</div>
+</section>
+
+<!-- 7 SEÑALES -->
+<section class="slide" data-title="Señales observables">
+  <div class="k">Cómo reconocerla</div>
+  <h1 style="font-size:56px">Señales <em>observables</em> en cada dimensión</h1>
+  <table class="tbl" style="font-size:16px"><thead><tr><th style="width:200px">Dimensión</th><th>Madurez baja</th><th>Madurez alta</th></tr></thead><tbody>
+    <tr class="step"><td><b>Gobernanza</b></td><td>Sponsor ausente; decisiones sin dueño</td><td>Sponsor activo; roles y aprobaciones claros</td></tr>
+    <tr class="step"><td><b>Alcance</b></td><td>Proceso no documentado; “ustedes ya saben qué necesitamos”</td><td>Proceso documentado; requisitos medibles</td></tr>
+    <tr class="step"><td><b>Cronograma</b></td><td>Reuniones canceladas; insumos que llegan tarde</td><td>Acuerdos cumplidos; disponibilidad confirmada</td></tr>
+    <tr class="step"><td><b>Finanzas</b></td><td>Solo pregunta “¿cuánto cuesta?”</td><td>Compara costo con valor esperado</td></tr>
+    <tr class="step"><td><b>Recursos</b></td><td>Equipo sin tiempo; accesos pendientes</td><td>Equipo asignado; credenciales listas</td></tr>
+    <tr class="step"><td><b>Partes interesadas</b></td><td>Cambios comunicados al final; resistencia oculta</td><td>Usuarios involucrados desde el diseño</td></tr>
+    <tr class="step"><td><b>Riesgo</b></td><td>Se reacciona a las crisis</td><td>Hay registro y responsables de riesgos</td></tr>
+  </tbody></table>
+</section>
+
+<!-- 8 PREGUNTAS -->
+<section class="slide" data-title="Preguntas que revelan la madurez">
+  <div class="k">Entrevista de diagnóstico</div>
+  <h1>Preguntas que <em>revelan</em> la madurez</h1>
+  <div class="g4 step stag" style="gap:12px">
+    <div class="card"><b>1 · Gobernanza</b><small style="color:var(--black)">¿Quién aprueba un cambio y en cuánto tiempo?</small></div>
+    <div class="card"><b>2 · Alcance</b><small style="color:var(--black)">¿Pueden mostrarme el proceso actual paso a paso?</small></div>
+    <div class="card"><b>3 · Cronograma</b><small style="color:var(--black)">¿Qué pasó la última vez que un proyecto se retrasó?</small></div>
+    <div class="card"><b>4 · Finanzas</b><small style="color:var(--black)">¿Cómo medirán que el proyecto valió la pena?</small></div>
+    <div class="card"><b>5 · Recursos</b><small style="color:var(--black)">¿Cuántas horas por semana puede dedicar su equipo?</small></div>
+    <div class="card"><b>6 · Partes interesadas</b><small style="color:var(--black)">¿Cómo reaccionó el equipo ante el último cambio de proceso?</small></div>
+    <div class="card"><b>7 · Riesgo</b><small style="color:var(--black)">¿Qué es lo peor que podría pasar y quién lo vigila?</small></div>
+    <div class="card red"><b>Triangular</b><small>Entrevistar · observar · revisar evidencia</small></div>
+  </div>
+  <div class="quote step mt2">Lo que dicen, lo que hacen y lo que está documentado <b>rara vez coinciden</b>. La madurez se ve en la diferencia.</div>
+</section>
+
+<!-- 9 STAKEHOLDERS CUADRANTE -->
+<section class="slide" data-dom="6" data-title="Madurez de los stakeholders">
+  <div class="k">Dominio 6 · Partes interesadas</div>
+  <h1>Madurez de los <em>stakeholders</em></h1>
+  <div style="display:grid;grid-template-columns:1fr 330px;gap:26px">
+    <div class="quad">
+      <div></div><div class="qh">Compromiso bajo</div><div class="qh">Compromiso alto</div>
+      <div class="qv">Capacidad alta</div>
+      <div class="q c step"><h3>CAPAZ PERO RETICENTE</h3><p>Persuadir: mostrar qué gana con el cambio.</p></div>
+      <div class="q a step"><h3>ALIADO MADURO</h3><p>Delegar y convertirlo en promotor.</p></div>
+      <div class="qv">Capacidad baja</div>
+      <div class="q b step"><h3>RIESGO DE ADOPCIÓN</h3><p>Acompañar de cerca, informar y capacitar.</p></div>
+      <div class="q d step"><h3>ENTUSIASTA SIN BASE</h3><p>Capacitar y canalizar su energía.</p></div>
+    </div>
+    <div class="col">
+      <div class="card step"><b>Gerencia</b>Aliado maduro</div>
+      <div class="card step"><b>TI</b>Capaz pero reticente: recibe carga adicional</div>
+      <div class="card step"><b>Logística</b>Entusiasta sin base</div>
+      <div class="card blk step"><b>Empleado del proceso</b>Riesgo de adopción</div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 MATRIZ COMPROMISO EDITABLE -->
+<section class="slide" data-dom="6" data-title="Compromiso actual vs. deseado">
+  <div class="k">Dominio 6 · Matriz de evaluación del compromiso</div>
+  <h1>Compromiso <em>actual</em> vs. <em>deseado</em></h1>
+  <div class="modes step"><span>Editar:</span><button class="pill on" id="mA" onclick="engMode('a')">A · Actual</button><button class="pill r" id="mD" onclick="engMode('d')">D · Deseado</button><span style="margin-left:10px;font-weight:400">Haz clic en una celda para mover el marcador.</span></div>
+  <table class="tbl eng step" id="eng"><thead><tr><th>Interesado</th><th class="c">Desconocedor</th><th class="c">Reticente</th><th class="c">Neutral</th><th class="c">Partidario</th><th class="c">Líder</th><th class="c">Brecha</th></tr></thead><tbody></tbody></table>
+  <div class="g3 step stag mt2">
+    <div class="card"><b>A · Actual</b>Dónde está hoy el interesado</div>
+    <div class="card red"><b>D · Deseado</b>Dónde necesita estar para que el proyecto tenga éxito</div>
+    <div class="card blk"><b>Brecha</b>Niveles por cerrar = esfuerzo de gestión</div>
+  </div>
+</section>
+
+<!-- 11 CASCADA -->
+<section class="slide" data-title="La madurez mueve los siete dominios">
+  <div class="k">La lámina esencial</div>
+  <h1 style="font-size:54px">La madurez <em>mueve</em> los siete dominios</h1>
+  <div style="display:grid;grid-template-columns:350px 1fr;gap:30px;align-items:start">
+    <div class="col">
+      <div class="quote step" style="font-size:19px">Diagnóstico: el <b>sponsor</b> tiene poca disponibilidad y tarda en decidir. ¿Qué ocurre?</div>
+      <div class="chips7" id="chips7">
+        <div class="c7" id="l1">1 · Gobernanza</div><div class="c7" id="l2">2 · Alcance</div><div class="c7" id="l3">3 · Cronograma</div><div class="c7" id="l4">4 · Finanzas</div>
+        <div class="c7" id="l5">5 · Recursos</div><div class="c7" id="l6">6 · Partes int.</div><div class="c7" id="l7">7 · Riesgo</div>
+      </div>
+      <p class="hint">Cada paso ilumina el dominio impactado.</p>
+    </div>
+    <div class="chain">
+      <div class="cl step" data-lit="l1"><span class="d">GOBERNANZA</span><span class="e"><i>→</i> delegado con autoridad y comité</span></div>
+      <div class="cl step" data-lit="l2"><span class="d">ALCANCE</span><span class="e"><i>→</i> se congela con firma formal</span></div>
+      <div class="cl step" data-lit="l3"><span class="d">CRONOGRAMA</span><span class="e"><i>→</i> holguras e hitos de aprobación</span></div>
+      <div class="cl step" data-lit="l5"><span class="d">RECURSOS</span><span class="e"><i>→</i> más horas de acompañamiento</span></div>
+      <div class="cl step" data-lit="l4"><span class="d">FINANZAS</span><span class="e"><i>→</i> reserva de contingencia mayor</span></div>
+      <div class="cl step" data-lit="l7"><span class="d">RIESGO</span><span class="e"><i>→</i> riesgo de parálisis y retrabajo</span></div>
+      <div class="cl step" data-lit="l6"><span class="d">STAKEHOLDERS</span><span class="e"><i>→</i> más comunicación y capacitación</span></div>
+    </div>
+  </div>
+  <div class="concept step" style="position:absolute;left:64px;right:64px;bottom:44px;padding:9px">Mismo proyecto, distinto plan: el diagnóstico calibra los siete dominios</div>
+</section>
+
+<!-- 12 SIMULADOR -->
+<section class="slide" data-dom="4" data-title="Simulador de impacto">
+  <div class="k">Dominio 4 · Finanzas · Simulador de impacto</div>
+  <h1>Mismo trabajo, <em>distinta exigencia</em></h1>
+  <div class="modes"><span>Madurez del cliente:</span><button class="pill" data-t="0">Alta</button><button class="pill" data-t="1">Media</button><button class="pill on r" data-t="2">Baja</button>
+    <span style="margin-left:8px;font-weight:400">Línea base: 78 h · 6 semanas · $10.000.000</span></div>
+  <div class="sim">
+    <div>
+      <table class="tbl" id="simT"><thead><tr><th>Indicador</th><th class="c" data-c="0">Alta</th><th class="c" data-c="1">Media</th><th class="c" data-c="2">Baja</th></tr></thead><tbody>
+        <tr><td>Factor de esfuerzo</td><td class="c" data-c="0">×1,10</td><td class="c" data-c="1">×1,25</td><td class="c" data-c="2">×1,50</td></tr>
+        <tr><td>Esfuerzo</td><td class="c" data-c="0">86 h</td><td class="c" data-c="1">98 h</td><td class="c" data-c="2">117 h</td></tr>
+        <tr><td>Duración</td><td class="c" data-c="0">6 sem</td><td class="c" data-c="1">7,5 sem</td><td class="c" data-c="2">9 sem</td></tr>
+        <tr><td>Presupuesto</td><td class="c" data-c="0">$11.000.000</td><td class="c" data-c="1">$12.500.000</td><td class="c" data-c="2">$15.000.000</td></tr>
+        <tr><td>Reserva de contingencia</td><td class="c" data-c="0">Baja</td><td class="c" data-c="1">Media</td><td class="c" data-c="2">Alta</td></tr>
+      </tbody></table>
+      <div class="concept mt" style="font-size:18px;text-align:left" id="simMsg"></div>
+      <p class="hint" style="margin-top:8px">Factores de ajuste ilustrativos sobre el caso CREATIVE.</p>
+    </div>
+    <div class="eff" id="simEff"></div>
+  </div>
+</section>
+
+<!-- 13 ESTRATEGIA POR NIVEL -->
+<section class="slide" data-title="Una estrategia por nivel">
+  <div class="k">Cómo adaptar el enfoque</div>
+  <h1>Una estrategia <em>por nivel</em></h1>
+  <div class="g3 step stag" style="gap:18px">
+    <div class="card red" style="padding:16px 20px"><h2 style="color:#fff">ACOMPAÑAR</h2><p style="font-size:15px;opacity:.9;margin-bottom:8px">Madurez baja · niveles 1–2</p>
+      <ul class="ul" style="color:#fff"><li>El consultor lidera y educa</li><li>Entregas cortas y visibles</li><li>Gobernanza reforzada</li><li>Capacitación desde el inicio</li></ul></div>
+    <div class="card blk" style="padding:16px 20px"><h2>CO-CREAR</h2><p style="font-size:15px;opacity:.8;margin-bottom:8px">Madurez media · nivel 3</p>
+      <ul class="ul" style="color:#fff"><li>Decisiones compartidas</li><li>Talleres conjuntos de proceso</li><li>Demos quincenales</li><li>Transferencia gradual</li></ul></div>
+    <div class="card" style="padding:16px 20px"><h2>DELEGAR</h2><p style="font-size:15px;color:var(--mid);margin-bottom:8px">Madurez alta · niveles 4–5</p>
+      <ul class="ul"><li>El cliente dueño de decisiones</li><li>El consultor asesora y revisa</li><li>Foco en valor y mejora continua</li><li>Reportes por excepción</li></ul></div>
+  </div>
+  <div class="quote step mt2">Aplicar el mismo enfoque a todos los clientes es la forma más común de <b>fracasar con alguno</b>.</div>
+</section>
+
+<!-- 14 COMUNICACIÓN -->
+<section class="slide" data-dom="6" data-title="Comunicar según la madurez">
+  <div class="k">Dominio 6 · Partes interesadas</div>
+  <h1>Comunicar según la <em>madurez</em></h1>
+  <table class="tbl"><thead><tr><th>Madurez</th><th>Enfoque</th><th>Frecuencia</th><th>Canal</th><th>Mensaje central</th></tr></thead><tbody>
+    <tr class="step"><td><b>Baja</b></td><td>Explicar y acompañar</td><td>Semanal</td><td>Taller presencial</td><td>Qué cambia para usted</td></tr>
+    <tr class="step"><td><b>Media</b></td><td>Involucrar</td><td>Quincenal</td><td>Demo</td><td>Qué opina del prototipo</td></tr>
+    <tr class="step"><td><b>Alta</b></td><td>Informar por excepción</td><td>Según hito</td><td>Tablero compartido</td><td>Resultados y decisiones pendientes</td></tr>
+  </tbody></table>
+  <div class="quote step mt2">Comunicar igual a todos es <b>comunicar mal a la mayoría</b>. El plan de comunicación se diseña desde el diagnóstico.</div>
+</section>
+
+<!-- 15 RIESGOS -->
+<section class="slide" data-dom="7" data-title="Riesgos que nacen de la madurez">
+  <div class="k">Dominio 7 · Riesgo · Registro</div>
+  <h1>Riesgos que <em>nacen</em> de la madurez</h1>
+  <table class="tbl" style="font-size:17px"><thead><tr><th>Riesgo</th><th class="c">P</th><th class="c">I</th><th>Respuesta</th><th>Responsable</th></tr></thead><tbody>
+    <tr class="step"><td>Sponsor sin disponibilidad</td><td class="c">A</td><td class="c">A</td><td>Delegado con autoridad y agenda de decisiones</td><td>Líder</td></tr>
+    <tr class="step"><td>Proceso no documentado</td><td class="c">A</td><td class="c">M</td><td>Taller AS-IS antes de diseñar</td><td>Analista</td></tr>
+    <tr class="step"><td>Resistencia del usuario</td><td class="c">M</td><td class="c">A</td><td>Capacitación y promotores internos</td><td>Líder</td></tr>
+    <tr class="step"><td>Dependencia de una persona clave</td><td class="c">M</td><td class="c">A</td><td>Documentar y asignar respaldo</td><td>Cliente</td></tr>
+    <tr class="step"><td>Expectativas irreales</td><td class="c">M</td><td class="c">M</td><td>Alinear con criterios de aceptación</td><td>Líder</td></tr>
+  </tbody></table>
+  <div class="concept step mt2">La baja madurez no es un defecto del cliente: es un riesgo del proyecto que se gestiona</div>
+  <p class="hint step mt" style="font-size:15px">P = probabilidad · I = impacto · A = alta · M = media · B = baja</p>
+</section>
+
+<!-- 16 GOBERNANZA ADAPTADA -->
+<section class="slide" data-dom="1" data-title="Misma solicitud, distinto circuito">
+  <div class="k">Dominio 1 · Gobernanza · Control de cambios</div>
+  <h1>Misma solicitud, <em>distinto circuito</em></h1>
+  <div class="quote step" style="font-size:21px">El cliente pide: <b>“Integrar las facturas con nuestro sistema contable.”</b></div>
+  <div class="col step stag mt2" style="gap:16px">
+    <div class="flow" style="gap:8px"><span class="chip r" style="min-width:150px;text-align:center">MADUREZ BAJA</span><span class="box">SOLICITUD</span><span class="ar">→</span><span class="box">ANÁLISIS DEL CONSULTOR</span><span class="ar">→</span><span class="box">COMITÉ</span><span class="ar">→</span><span class="box">FIRMA</span><span class="ar">→</span><span class="box r">CAMBIO</span></div>
+    <div class="flow" style="gap:8px"><span class="chip" style="min-width:150px;text-align:center">MADUREZ MEDIA</span><span class="box">SOLICITUD</span><span class="ar">→</span><span class="box">IMPACTO CONJUNTO</span><span class="ar">→</span><span class="box">SPONSOR</span><span class="ar">→</span><span class="box r">CAMBIO</span></div>
+    <div class="flow" style="gap:8px"><span class="chip o" style="min-width:150px;text-align:center">MADUREZ ALTA</span><span class="box">SOLICITUD</span><span class="ar">→</span><span class="box">DUEÑO DEL PROCESO</span><span class="ar">→</span><span class="box r">CAMBIO + REGISTRO</span></div>
+  </div>
+  <div class="step mt2"><p style="font-weight:600;margin-bottom:8px">En todos los casos se analiza el impacto sobre:</p>
+    <div class="flow" style="gap:10px"><span class="chip r">Alcance</span><span class="chip r">Tiempo</span><span class="chip r">Recursos</span><span class="chip r">Costo</span><span class="chip r">Riesgos</span></div></div>
+</section>
+
+<!-- 17 DIAGNÓSTICO INTERACTIVO -->
+<section class="slide" data-title="Diagnóstico interactivo de CREATIVE">
+  <div class="k">Aplicación al caso</div>
+  <h1 style="margin-bottom:8px">Diagnóstico <em>interactivo</em> de CREATIVE</h1>
+  <div class="diag">
+    <div>
+      <div class="scale"><span></span><div><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div>
+      <div id="dRows"></div>
+      <p class="hint" style="margin-top:8px">Haz clic en las puntuaciones para recalcular el perfil.</p>
+    </div>
+    <div>
+      <svg id="radar" viewBox="-30 0 400 262" width="400" style="display:block"></svg>
+      <div class="res" id="dRes"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 18 EVOLUCIÓN -->
+<section class="slide" data-title="La madurez no es fija">
+  <div class="k">Seguimiento</div>
+  <h1>La madurez <em>no es fija</em></h1>
+  <div class="tl step stag">
+    <div class="m">Kickoff<small>Línea de partida</small><div class="big" style="font-size:58px;margin-top:6px">2,1</div></div>
+    <div class="m">Prototipo aprobado<small>Primera reevaluación</small><div class="big" style="font-size:58px;margin-top:6px">2,6</div></div>
+    <div class="m">Pruebas aceptadas<small>Segunda reevaluación</small><div class="big" style="font-size:58px;margin-top:6px">3,2</div></div>
+    <div class="m">Paso a producción<small>Cierre</small><div class="big" style="font-size:58px;margin-top:6px">3,8</div></div>
+  </div>
+  <div class="g3 step stag mt2" style="margin-top:34px">
+    <div class="card"><b>Reevaluar</b>El perfil se mide de nuevo en cada hito</div>
+    <div class="card"><b>Ajustar</b>El plan cambia cuando el cliente madura</div>
+    <div class="card"><b>Registrar</b>Las lecciones aprendidas alimentan el siguiente proyecto</div>
+  </div>
+</section>
+
+<!-- 19 RUTA -->
+<section class="slide" data-title="Ruta del diagnóstico">
+  <div class="k">Método de trabajo</div>
+  <h1>Ruta del <em>diagnóstico</em></h1>
+  <div class="g3 step stag" style="gap:16px">
+    <div class="card" style="padding:18px 20px"><b>1 · Observar</b>Reuniones, procesos y cultura de decisión</div>
+    <div class="card" style="padding:18px 20px"><b>2 · Entrevistar</b>Sponsor, usuarios, TI y finanzas</div>
+    <div class="card" style="padding:18px 20px"><b>3 · Puntuar</b>Siete dimensiones en escala 1–5</div>
+    <div class="card" style="padding:18px 20px"><b>4 · Clasificar stakeholders</b>Compromiso actual vs. deseado</div>
+    <div class="card red" style="padding:18px 20px"><b>5 · Ajustar el plan</b>Estimación, cronograma, presupuesto y riesgos</div>
+    <div class="card blk" style="padding:18px 20px"><b>6 · Reevaluar</b>En cada hito del proyecto</div>
+  </div>
+  <div class="flow step stag mt2" style="justify-content:center;gap:10px"><span class="box w">DIAGNÓSTICO</span><span class="ar">→</span><span class="box">PERFIL</span><span class="ar">→</span><span class="box">ESTRATEGIA</span><span class="ar">→</span><span class="box">PLAN AJUSTADO</span><span class="ar">→</span><span class="box r">PROPUESTA REALISTA</span></div>
+</section>
+
+<!-- 20 ENTREGABLES -->
+<section class="slide" data-title="Qué debe entregar la consultora">
+  <div class="k">Checklist del diagnóstico</div>
+  <h1>Qué debe <em>entregar</em> la consultora</h1>
+  <div class="g4 step stag" style="gap:12px">
+    <div class="card"><b>1 · Gobernanza</b><small>Circuito de decisiones adaptado al nivel del cliente</small></div>
+    <div class="card"><b>2 · Alcance</b><small>Requisitos validados y criterios de aceptación acordados</small></div>
+    <div class="card"><b>3 · Cronograma</b><small>Holguras e hitos de aprobación según madurez</small></div>
+    <div class="card"><b>4 · Finanzas</b><small>Presupuesto con reserva calibrada y pagos por hitos</small></div>
+  </div>
+  <div class="g3 step stag mt" style="gap:12px">
+    <div class="card"><b>5 · Recursos</b><small>Dedicación del cliente comprometida y capacitación</small></div>
+    <div class="card"><b>6 · Partes interesadas</b><small>Matriz actual/deseado y plan de comunicación diferenciado</small></div>
+    <div class="card"><b>7 · Riesgo</b><small>Registro que incluye los riesgos derivados de la madurez</small></div>
+  </div>
+  <div class="concept step mt2">Perfil de madurez → siete ajustes → propuesta más realista</div>
+</section>
+
+<!-- 21 CIERRE -->
+<section class="slide dark hero" data-title="Cierre" style="--img:url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1920&q=80')">
+  <div class="k">Cierre</div>
+  <h1>Un consultor no solo <em>entrega</em> tecnología.<br>Primero <em>lee al cliente</em>.</h1>
+  <p class="sub">Antes de prometer fechas, cifras y resultados, la firma debe responder:</p>
+  <div class="g4 step stag" style="gap:12px">
+    <div class="card"><b>1</b>¿Qué tan maduro es el cliente en cada dominio?</div>
+    <div class="card"><b>2</b>¿Qué stakeholders necesitan más acompañamiento?</div>
+    <div class="card"><b>3</b>¿Cómo cambia esto el esfuerzo, el plazo y el costo?</div>
+    <div class="card"><b>4</b>¿Qué riesgos nacen de esta madurez?</div>
+  </div>
+  <div class="quote step mt2" style="background:var(--red);border-left-color:#fff;font-size:30px;text-align:center;padding:22px"><b style="color:#fff">Pregunta final:</b> ¿Está el cliente listo para esta automatización y qué haremos para que lo esté?</div>
+</section>
+
+  <div id="prog"></div><div id="count"></div>
+</div>
+
+<div id="hintbar">→ / clic / espacio: avanzar paso a paso · ← : retroceder · G: guía PMBOK 8 · I: índice · F: pantalla completa</div>
+<div id="ctl">
+  <button id="bPrev" title="Anterior">◀</button>
+  <button id="bNext" title="Siguiente">▶</button>
+  <button id="bIdx">☰ Índice</button>
+  <button id="bFull">⛶</button>
+  <button id="bGuide" class="main">★ Guía PMBOK 8</button>
+</div>
+
+<div class="modal" id="mGuide"><div class="mbox">
+  <div class="mnav" id="gNav"></div>
+  <div class="mdet" id="gDet"></div>
+</div></div>
+<div class="modal" id="mIdx"><div class="idx" id="idxBox"></div></div>
+
+<script>
+const DOMS=[
+ {n:'Gobernanza',ico:'🏛️',q:'¿Quién decide y con qué rapidez?',o:'¿Hay sponsor activo y decisiones a tiempo?',obs:'Sponsor presente, decisiones con dueño, tiempos de aprobación y tolerancia al control de cambios.',imp:'Con baja madurez las decisiones se acumulan y el proyecto se detiene esperando aprobaciones; con alta madurez, la autonomía acelera la entrega.',aj:'Circuito de cambios y aprobaciones proporcional al nivel del cliente.',slide:16},
+ {n:'Alcance',ico:'🎯',q:'¿Saben realmente lo que necesitan?',o:'¿Conocen y documentan su proceso?',obs:'Proceso documentado, requisitos medibles y capacidad de priorizar y decir “esto no entra”.',imp:'Requisitos difusos generan ampliaciones, retrabajo y discusiones sobre lo que se había prometido.',aj:'Talleres AS-IS, prototipos tempranos y criterios de aceptación firmados.',slide:12},
+ {n:'Cronograma',ico:'📅',q:'¿Cumplen sus compromisos?',o:'¿Cumplen plazos y acuerdos?',obs:'Puntualidad en insumos y reuniones, y disponibilidad real del equipo del cliente.',imp:'Los retrasos del cliente se convierten en retrasos del proyecto aunque el trabajo técnico avance bien.',aj:'Holguras, hitos de aprobación y compromisos de insumos con fecha.',slide:12},
+ {n:'Finanzas',ico:'💰',q:'¿Miden valor o solo costo?',o:'¿Miden valor, no solo costo?',obs:'Cómo justifican la inversión, si definen beneficios esperados y cómo tratan los cambios de presupuesto.',imp:'Quien solo mira el costo recorta donde más duele; quien mide valor sostiene la inversión.',aj:'Presupuesto con reserva calibrada, pagos por hitos y beneficios medibles.',slide:12},
+ {n:'Recursos',ico:'🧰',q:'¿Tienen capacidad real?',o:'¿Tienen personas y tiempo disponibles?',obs:'Personas asignadas, tiempo dedicado, accesos, credenciales y habilidades digitales.',imp:'Un equipo sin tiempo o sin accesos frena el proyecto y traslada carga a la consultora.',aj:'Dedicación del cliente comprometida por escrito y capacitación incluida.',slide:12},
+ {n:'Partes interesadas',ico:'🤝',q:'¿Adoptarán el cambio?',o:'¿Aceptan y adoptan el cambio?',obs:'Compromiso actual vs. deseado, resistencia declarada u oculta e historial con cambios previos.',imp:'La adopción define el éxito: una automatización excelente que nadie usa no genera valor.',aj:'Matriz de compromiso, estrategia por interesado y comunicación diferenciada.',slide:10},
+ {n:'Riesgo',ico:'⚠️',q:'¿Anticipan o reaccionan?',o:'¿Anticipan o apagan incendios?',obs:'Registros de riesgos, planes de contingencia y cultura de reportar problemas a tiempo.',imp:'Cuando se reacciona a las crisis, los riesgos se materializan sin respuesta preparada.',aj:'Registro de riesgos que incluya los derivados de la madurez, con responsables.',slide:15}
+];
+const slides=[...document.querySelectorAll('.slide')];
+const stage=document.getElementById('stage');
+const N=slides.length; let cur=0; const shown=slides.map(()=>0);
+let stepsOf=[];
+
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);stage.style.transform=`scale(${s})`;stage.style.left=((innerWidth-1280*s)/2)+'px';stage.style.top=((innerHeight-720*s)/2)+'px';}
+addEventListener('resize',fit);fit();
+
+/* órbita */
+(function(){const o=document.getElementById('orbit');DOMS.forEach((d,i)=>{const a=(-90+i*360/7)*Math.PI/180;const el=document.createElement('div');el.className='nd step';el.style.left=(50+39*Math.cos(a))+'%';el.style.top=(50+38*Math.sin(a))+'%';el.innerHTML=`<b><i>${i+1}</i>${d.n.toUpperCase()}</b><span>${d.o}</span>`;el.onclick=e=>{e.stopPropagation();openGuide(i)};o.appendChild(el);});})();
+
+/* matriz de compromiso editable */
+const LEVELS=['Desconocedor','Reticente','Neutral','Partidario','Líder'];
+const ENG=[{n:'Gerencia (sponsor)',a:3,d:4},{n:'Empleado del proceso',a:1,d:3},{n:'TI',a:2,d:3},{n:'Logística',a:0,d:3},{n:'Clientes',a:2,d:2}];
+let engM='a';
+function engMode(m){engM=m;document.getElementById('mA').classList.toggle('on',m==='a');document.getElementById('mD').classList.toggle('on',m==='d');}
+function engRender(){
+  const tb=document.querySelector('#eng tbody');
+  tb.innerHTML=ENG.map((r,i)=>`<tr>${'<td><b>'+r.n+'</b></td>'}${LEVELS.map((l,j)=>`<td class="c cell" onclick="engSet(${i},${j})">${r.a===j?'<span class="mk a">A</span>':''}${r.d===j?'<span class="mk d">D</span>':''}</td>`).join('')}<td class="c"><span class="gap" style="color:${r.d-r.a>1?'var(--red)':r.d-r.a>0?'#f5b301':r.d-r.a===0?'#2fb24c':'var(--mid)'}">${r.d-r.a>0?'+':''}${r.d-r.a}</span></td></tr>`).join('');
+}
+function engSet(i,j){ENG[i][engM]=j;engRender();}
+engRender();
+
+/* simulador */
+const TIER=[
+ {n:'alta',msg:'Madurez alta: el consultor asesora, el cliente decide y ejecuta. Menor reserva y plan ajustado.',eff:['Autonomía delegada','Requisitos estables','Plan ajustado','Reserva menor','El equipo del cliente aporta','Comunicación ligera','Seguimiento por hito']},
+ {n:'media',msg:'Madurez media: se co-crea con el cliente. Holguras moderadas y demos quincenales.',eff:['Decisiones compartidas','Talleres de refinamiento','Holguras moderadas','Reserva media','Apoyo parcial del consultor','Demos quincenales','Seguimiento quincenal']},
+ {n:'baja',msg:'Madurez baja: el consultor acompaña y educa. Más esfuerzo, más plazo, más reserva.',eff:['Comité y firma por cambio','Congelar y prototipar','Buffers e hitos de aprobación','Reserva alta y pagos por hitos','El consultor acompaña y capacita','Plan de cambio intensivo','Seguimiento semanal']}
+];
+function simSet(t){
+  document.querySelectorAll('#simT [data-c]').forEach(c=>c.classList.toggle('sel',+c.dataset.c===t));
+  document.querySelectorAll('.modes [data-t]').forEach(b=>{b.classList.toggle('on',+b.dataset.t===t);b.classList.toggle('r',+b.dataset.t===t)});
+  document.getElementById('simMsg').textContent=TIER[t].msg;
+  document.getElementById('simEff').innerHTML=DOMS.map((d,i)=>`<div><b>${i+1} · ${d.n==='Partes interesadas'?'Partes int.':d.n}</b>${TIER[t].eff[i]}</div>`).join('');
+}
+document.querySelectorAll('.modes [data-t]').forEach(b=>b.onclick=()=>{simSet(+b.dataset.t);b.blur()});
+simSet(2);
+
+/* diagnóstico con radar */
+const SHORT=['Gobernanza','Alcance','Cronograma','Finanzas','Recursos','Partes int.','Riesgo'];
+const LVN=[['REACTIVO','Improvisa y depende de personas clave'],['EMERGENTE','Prácticas presentes pero inconsistentes'],['DEFINIDO','Procesos y roles documentados'],['GESTIONADO','Mide, decide con datos y controla cambios'],['OPTIMIZADO','Mejora continua y aprende de cada proyecto']];
+const SCORES=[2,2,3,3,2,2,1];
+const dRows=document.getElementById('dRows');
+dRows.innerHTML=SHORT.map((n,i)=>`<div class="dr"><span>${i+1} · ${n}</span><div class="pills" data-d="${i}">${[1,2,3,4,5].map(v=>`<button data-v="${v}">${v}</button>`).join('')}</div></div>`).join('');
+dRows.querySelectorAll('.pills button').forEach(b=>b.onclick=()=>{SCORES[+b.parentNode.dataset.d]=+b.dataset.v;diagRender();b.blur()});
+function diagRender(){
+  dRows.querySelectorAll('.pills').forEach(p=>[...p.children].forEach(b=>b.classList.toggle('on',+b.dataset.v===SCORES[+p.dataset.d])));
+  const cx=170,cy=132,R=96;const pt=(i,v)=>{const a=(-90+i*360/7)*Math.PI/180;return[cx+R*v/5*Math.cos(a),cy+R*v/5*Math.sin(a)]};
+  let s='';
+  for(let r=1;r<=5;r++)s+=`<polygon points="${SHORT.map((_,i)=>pt(i,r).join(',')).join(' ')}" fill="none" stroke="#e4e4e4" stroke-width="1"/>`;
+  SHORT.forEach((n,i)=>{const[x,y]=pt(i,5);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e4e4e4"/>`;const[lx,ly]=pt(i,6.2);const an=Math.abs(lx-cx)<10?'middle':lx>cx?'start':'end';s+=`<text x="${lx}" y="${ly+4}" text-anchor="${an}" font-size="12" font-weight="700" fill="#141414" font-family="Inter,Arial">${n}</text>`;});
+  s+=`<polygon points="${SCORES.map((v,i)=>pt(i,v).join(',')).join(' ')}" fill="rgba(229,9,20,.28)" stroke="#E50914" stroke-width="3" stroke-linejoin="round"/>`;
+  SCORES.forEach((v,i)=>{const[x,y]=pt(i,v);s+=`<circle cx="${x}" cy="${y}" r="5" fill="#E50914" stroke="#fff" stroke-width="2"/>`});
+  document.getElementById('radar').innerHTML=s;
+  const avg=SCORES.reduce((a,b)=>a+b,0)/7;
+  const lvl=avg<1.8?1:avg<2.6?2:avg<3.4?3:avg<4.2?4:5;
+  const t=lvl<=2?2:lvl===3?1:0;
+  const strat=['DELEGAR','CO-CREAR','ACOMPAÑAR'][t];
+  const f=[1.10,1.25,1.50][t],wk=['6','7,5','9'][t],bud=['$11.000.000','$12.500.000','$15.000.000'][t];
+  const mn=Math.min(...SCORES),wi=SCORES.indexOf(mn);
+  document.getElementById('dRes').innerHTML=`<div class="lv">NIVEL ${lvl} · ${LVN[lvl-1][0]} <span style="font-size:20px;color:#fff;white-space:nowrap">(${avg.toFixed(1).replace('.',',')})</span></div><div class="st">Estrategia: ${strat}</div><div class="sc">Dimensión más débil: <b>${SHORT[wi]} (${mn})</b><br>Esfuerzo: <b>${Math.round(78*f)} h</b> · Duración: <b>${wk} sem</b> · Presupuesto: <b>${bud}</b></div>`;
+}
+diagRender();
+
+/* stagger */
+document.querySelectorAll('.stag').forEach(g=>[...g.children].forEach((c,i)=>c.style.setProperty('--i',i)));
+stepsOf=slides.map(s=>[...s.querySelectorAll('.step')].filter(e=>!e.classList.contains('gh')));
+
+function apply(){
+  const st=stepsOf[cur];
+  st.forEach((e,j)=>e.classList.toggle('on',j<shown[cur]));
+  document.querySelectorAll('.c7').forEach(c=>c.classList.remove('lit'));
+  st.forEach((e,j)=>{if(j<shown[cur]&&e.dataset.lit){document.getElementById(e.dataset.lit).classList.add('lit')}});
+}
+function go(i,full){
+  slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');
+  shown[cur]=full?stepsOf[cur].length:0;apply();
+  stage.classList.toggle('dark',slides[cur].classList.contains('dark'));
+  const d=+slides[cur].dataset.dom||0,chip=document.getElementById('domchip');
+  if(d){chip.textContent='Dominio '+d+' · '+DOMS[d-1].n;chip.dataset.d=d-1;chip.classList.add('show')}else chip.classList.remove('show');
+  document.getElementById('prog').style.width=((cur+1)/N*100)+'%';
+  document.getElementById('count').textContent=(cur+1)+' / '+N;
+  history.replaceState(null,'','#'+(cur+1));
+}
+function next(){if(shown[cur]<stepsOf[cur].length){shown[cur]++;apply()}else if(cur<N-1)go(cur+1,false)}
+function prev(){if(shown[cur]>0){shown[cur]--;apply()}else if(cur>0)go(cur-1,true)}
+
+function openGuide(i){buildGuide(i);document.getElementById('mGuide').classList.add('open')}
+function buildGuide(sel){
+  const nav=document.getElementById('gNav');
+  nav.innerHTML='<h3><em>PMBOK 8</em> · Guía rápida</h3>'+`<button class="${sel==-1?'sel':''}" data-i="-1"><i>★</i>¿Por qué medir la madurez?</button>`+DOMS.map((d,i)=>`<button class="${sel==i?'sel':''}" data-i="${i}"><i>${i+1}</i>${d.n}</button>`).join('');
+  nav.querySelectorAll('button').forEach(b=>b.onclick=()=>buildGuide(+b.dataset.i));
+  const det=document.getElementById('gDet');
+  if(sel==-1){det.innerHTML=`<button class="x" onclick="closeM()">×</button><div class="ico">🧭</div><h2>¿Por qué medir la madurez?</h2><div class="q1">Dos clientes, un mismo proyecto, dos planes distintos</div>
+   <h4>La idea clave</h4><p>PMBOK 8 plantea los <b>siete dominios de desempeño</b> como un sistema integrado. La madurez del cliente determina qué tan bien funciona cada dominio en su organización: cuánto se decide, se documenta, se cumple, se adopta y se anticipa.</p>
+   <h4>Por qué le sirve a una consultora</h4><p>Un diagnóstico temprano permite calibrar estimaciones, cronograma, presupuesto, recursos, comunicación y riesgos antes de comprometerse con el cliente, y decidir cuánto acompañar, co-crear o delegar.</p>
+   <div class="conn"><b>Interconexión:</b> si el sponsor tiene baja madurez, cambian la gobernanza, el alcance, el cronograma, los recursos, las finanzas, el riesgo y la comunicación con los stakeholders (lámina 11).</div>
+   <button class="go" onclick="jump(5)">Ver las siete dimensiones →</button>`;return}
+  const d=DOMS[sel];
+  det.innerHTML=`<button class="x" onclick="closeM()">×</button><div class="ico">${d.ico}</div><h2>${sel+1}. ${d.n}</h2><div class="q1">${d.q}</div>
+   <h4>Qué observar</h4><p>${d.obs}</p>
+   <h4>Cómo impacta al proyecto</h4><p>${d.imp}</p>
+   <h4>Ajuste de la consultora</h4><p><b>${d.aj}</b></p>
+   <div class="conn">Los dominios están conectados: la madurez en uno afecta a los demás (lámina 11).</div>
+   <button class="go" onclick="jump(${d.slide})">Ir a la lámina ${d.slide} →</button>`;
+}
+function closeM(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'))}
+function jump(n){closeM();go(n-1,false)}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM()}));
+
+document.getElementById('idxBox').innerHTML='<h3>Índice de láminas</h3>'+slides.map((s,i)=>`<button onclick="jump(${i+1})"><i>${i+1}</i>${s.dataset.title}</button>`).join('');
+
+document.getElementById('bNext').onclick=e=>{e.stopPropagation();next()};
+document.getElementById('bPrev').onclick=e=>{e.stopPropagation();prev()};
+document.getElementById('bGuide').onclick=()=>{const d=+slides[cur].dataset.dom;openGuide(d?d-1:-1)};
+document.getElementById('bIdx').onclick=()=>document.getElementById('mIdx').classList.add('open');
+document.getElementById('bFull').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
+document.getElementById('domchip').onclick=e=>{e.stopPropagation();openGuide(+e.currentTarget.dataset.d)};
+stage.addEventListener('click',e=>{if(!e.target.closest('.nd,.diag,.modes,.eng,.sim button'))next()});
+addEventListener('keydown',e=>{
+  const open=document.querySelector('.modal.open');
+  if(e.key==='Escape'){closeM();return}
+  if(open&&open.id==='mGuide'){if(/^[1-7]$/.test(e.key)){buildGuide(+e.key-1)}if(e.key==='0')buildGuide(-1);return}
+  if(open)return;
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==='Home')go(0,false);else if(e.key==='End')go(N-1,true);
+  else if(e.key==='g'||e.key==='G')document.getElementById('bGuide').click();
+  else if(e.key==='i'||e.key==='I')document.getElementById('bIdx').click();
+  else if(e.key==='f'||e.key==='F')document.getElementById('bFull').click();
+});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?next():prev()}tx=null},{passive:true});
+
+const h=parseInt(location.hash.slice(1));
+slides[0].classList.add('active');go(h>=1&&h<=N?h-1:0,false);
+</script>
+</body>
+</html>
